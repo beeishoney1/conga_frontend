@@ -41,7 +41,7 @@ const Nav = ({ currentUser, onLogout }) => {
             fontFamily: 'Poppins, sans-serif'
           }}
         >
-          💎 Diamond Shop
+          💎 Conga Shop
         </button>
       </div>
 
