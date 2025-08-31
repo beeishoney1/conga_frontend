@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api/backendAPI';
-import { FaGem, FaGamepad, FaServer, FaMoneyBillWave, FaCreditCard, FaCrown, FaShoppingCart, FaExclamationTriangle } from 'react-icons/fa';
+import { FaGem, FaGamepad, FaServer, FaMoneyBillWave, FaCreditCard, FaCrown, FaShoppingCart, FaExclamationTriangle, FaCheckCircle, FaTimes } from 'react-icons/fa';
 
 const Home = ({ currentUser }) => {
   const [prices, setPrices] = useState([]);
@@ -14,6 +14,11 @@ const Home = ({ currentUser }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [showLoginAlert, setShowLoginAlert] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  
+  // Use ref to track submission state to prevent duplicates
+  const isSubmittingRef = useRef(false);
 
   useEffect(() => {
     loadPrices();
@@ -48,8 +53,14 @@ const Home = ({ currentUser }) => {
 
   const handlePurchaseSubmit = async (e) => {
     e.preventDefault();
+    
+    // Prevent duplicate submissions using ref
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    
     if (!gameId || !serverId || !paymentMethod || !paymentNumber || !paymentName) {
       setMessage('Please fill all fields');
+      isSubmittingRef.current = false;
       return;
     }
 
@@ -66,21 +77,29 @@ const Home = ({ currentUser }) => {
         paymentName
       );
 
-      setMessage(res.message || 'Purchase request submitted successfully!');
-      setTimeout(() => {
-        setShowPurchaseModal(false);
-        setGameId('');
-        setServerId('');
-        setPaymentMethod('');
-        setPaymentNumber('');
-        setPaymentName('');
-        setMessage('');
-      }, 2000);
+      // Set success message and show alert
+      setSuccessMessage(res.message || 'Purchase request submitted successfully!');
+      setShowSuccessAlert(true);
+      
+      // Close modal immediately
+      setShowPurchaseModal(false);
+      
+      // Clear form fields
+      setGameId('');
+      setServerId('');
+      setPaymentMethod('');
+      setPaymentNumber('');
+      setPaymentName('');
+      
     } catch (error) {
       console.error('Purchase error:', error);
       setMessage('Error submitting purchase: ' + error.message);
     } finally {
       setIsSubmitting(false);
+      // Reset submission ref after a short delay to ensure no duplicate submissions
+      setTimeout(() => {
+        isSubmittingRef.current = false;
+      }, 1000);
     }
   };
 
@@ -108,6 +127,27 @@ const Home = ({ currentUser }) => {
 
   return (
     <div className="p-2">
+      {/* Success Alert Box */}
+      {showSuccessAlert && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg p-4 max-w-xs mx-auto animate-pop-in shadow-xl">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <FaCheckCircle className="text-green-500 text-xl" />
+              </div>
+              <h3 className="font-bold text-lg text-gray-800 mb-2">Success!</h3>
+              <p className="text-gray-600 text-sm mb-4">{successMessage}</p>
+              <button
+                onClick={() => setShowSuccessAlert(false)}
+                className="bg-cyan-500 hover:bg-cyan-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header with floating animation */}
       <div className="mb-3 text-center animate-float">
         <h1 className="text-sm font-bold text-white mb-1" style={{ textShadow: '0 0 4px rgba(0,230,255,0.8)' }}>
@@ -213,30 +253,29 @@ const Home = ({ currentUser }) => {
                     </div>
                   </div>
 
-                 <button
-  onClick={() => handleBuyClick(price)}
-  className="w-full py-1.5 rounded-lg text-white font-semibold text-xs flex items-center justify-center gap-1 transition-all duration-300 relative overflow-hidden group"
-  style={{
-    background: 'linear-gradient(135deg, #00e6ff, #0077ff)',
-    boxShadow: '0 4px 15px rgba(0, 230, 255, 0.4)',
-  }}
->
-  {/* Shine effect */}
-  <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
-  
-  {/* Content */}
-  <FaShoppingCart className="text-xs transition-transform group-hover:scale-110" />
-  <span className="transition-transform group-hover:scale-105">Buy</span>
-  
-  {/* Pulse effect */}
-  <div className="absolute inset-0 rounded-lg animate-pulse group-hover:animate-none" 
-       style={{
-         boxShadow: '0 0 0 0 rgba(0, 230, 255, 0.7)',
-         animation: 'pulse-cyan 2s infinite'
-       }}>
-  </div>
-</button>
-
+                  <button
+                    onClick={() => handleBuyClick(price)}
+                    className="w-full py-1.5 rounded-lg text-white font-semibold text-xs flex items-center justify-center gap-1 transition-all duration-300 relative overflow-hidden group"
+                    style={{
+                      background: 'linear-gradient(135deg, #00e6ff, #0077ff)',
+                      boxShadow: '0 4px 15px rgba(0, 230, 255, 0.4)',
+                    }}
+                  >
+                    {/* Shine effect */}
+                    <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
+                    
+                    {/* Content */}
+                    <FaShoppingCart className="text-xs transition-transform group-hover:scale-110" />
+                    <span className="transition-transform group-hover:scale-105">Buy</span>
+                    
+                    {/* Pulse effect */}
+                    <div className="absolute inset-0 rounded-lg animate-pulse group-hover:animate-none" 
+                         style={{
+                           boxShadow: '0 0 0 0 rgba(0, 230, 255, 0.7)',
+                           animation: 'pulse-cyan 2s infinite'
+                         }}>
+                    </div>
+                  </button>
                 </div>
               </div>
             ))}
@@ -341,6 +380,7 @@ const Home = ({ currentUser }) => {
                   value={gameId}
                   onChange={(e) => setGameId(e.target.value)}
                   required
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -355,6 +395,7 @@ const Home = ({ currentUser }) => {
                   value={serverId}
                   onChange={(e) => setServerId(e.target.value)}
                   required
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -369,6 +410,7 @@ const Home = ({ currentUser }) => {
                       checked={paymentMethod === 'wave'}
                       onChange={() => setPaymentMethod('wave')}
                       className="radio radio-primary radio-xs"
+                      disabled={isSubmitting}
                     />
                     <span className="flex items-center gap-1">
                       <FaMoneyBillWave className="text-xs" /> Wave
@@ -382,6 +424,7 @@ const Home = ({ currentUser }) => {
                       checked={paymentMethod === 'kpay'}
                       onChange={() => setPaymentMethod('kpay')}
                       className="radio radio-primary radio-xs"
+                      disabled={isSubmitting}
                     />
                     <span className="flex items-center gap-1">
                       <FaCreditCard className="text-xs" /> KPay
@@ -418,6 +461,7 @@ const Home = ({ currentUser }) => {
                         value={paymentNumber}
                         onChange={(e) => setPaymentNumber(e.target.value)}
                         required
+                        disabled={isSubmitting}
                       />
                     </div>
                     
@@ -432,6 +476,7 @@ const Home = ({ currentUser }) => {
                         value={paymentName}
                         onChange={(e) => setPaymentName(e.target.value)}
                         required
+                        disabled={isSubmitting}
                       />
                     </div>
                   </div>
@@ -458,7 +503,10 @@ const Home = ({ currentUser }) => {
                 <button
                   type="submit"
                   className="btn btn-sm w-full text-white transition-all hover:scale-105"
-                  style={{ background: 'linear-gradient(135deg, #00e6ff, #0077ff)' }}
+                  style={{ 
+                    background: 'linear-gradient(135deg, #00e6ff, #0077ff)',
+                    opacity: isSubmitting ? 0.7 : 1
+                  }}
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -497,18 +545,17 @@ const Home = ({ currentUser }) => {
           animation: fade-in 0.3s ease-out forwards;
         }
           
-  @keyframes pulse-cyan {
-    0% {
-      box-shadow: 0 0 0 0 rgba(0, 230, 255, 0.7);
-    }
-    70% {
-      box-shadow: 0 0 0 10px rgba(0, 230, 255, 0);
-    }
-    100% {
-      box-shadow: 0 0 0 0 rgba(0, 230, 255, 0);
-    }
-  
-
+        @keyframes pulse-cyan {
+          0% {
+            box-shadow: 0 0 0 0 rgba(0, 230, 255, 0.7);
+          }
+          70% {
+            boxShadow: 0 0 0 10px rgba(0, 230, 255, 0);
+          }
+          100% {
+            boxShadow: 0 0 0 0 rgba(0, 230, 255, 0);
+          }
+        }
       `}</style>
     </div>
   );
