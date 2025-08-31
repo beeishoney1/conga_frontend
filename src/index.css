@@ -1,2 +1,7 @@
 @import "tailwindcss";
 @plugin "daisyui";
+/* Set black background for the entire app */
+body, html, #root {
+  background-color: #000 !important;
+  color: #fff !important;
+}
