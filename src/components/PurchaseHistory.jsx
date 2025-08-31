@@ -353,7 +353,7 @@ const PurchaseHistory = ({ user }) => {
         background: 'rgba(0,230,255,0.1)',
       }}>
         <p className="text-cyan-300 font-semibold mb-1">💡 Voucher Numbers</p>
-        <p className="text-gray-300">Use voucher numbers when contacting support for faster service.</p>
+        <p className="text-gray-300">အမြန်လိုချင်တဲ့အခါဒါမမဟုတ်ပြဿနာတစ်စုံတစ်ရာဖြစ်ပါက Vouchers နံပတ်များကိုအသုံးပြုပြီးဖြေရှင်းနိုင်ပါတယ်။</p>
       </div>
     </div>
   );
