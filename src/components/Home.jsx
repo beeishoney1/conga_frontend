@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/backendAPI';
-import { FaGem, FaGamepad, FaServer, FaMoneyBillWave, FaCreditCard, FaCrown, FaShoppingCart } from 'react-icons/fa';
+import { FaGem, FaGamepad, FaServer, FaMoneyBillWave, FaCreditCard, FaCrown, FaShoppingCart, FaExclamationTriangle } from 'react-icons/fa';
 
 const Home = ({ currentUser }) => {
   const [prices, setPrices] = useState([]);
@@ -13,6 +13,7 @@ const Home = ({ currentUser }) => {
   const [paymentName, setPaymentName] = useState(''); // Empty by default
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
+  const [showLoginAlert, setShowLoginAlert] = useState(false); // New state for login alert
 
   useEffect(() => {
     loadPrices();
@@ -29,8 +30,7 @@ const Home = ({ currentUser }) => {
 
   const handleBuyClick = (price) => {
     if (!currentUser) {
-      alert('Please login first');
-      window.location.hash = '#login';
+      setShowLoginAlert(true);
       return;
     }
     setSelectedPackage(price);
@@ -39,6 +39,11 @@ const Home = ({ currentUser }) => {
     setPaymentMethod('');
     setPaymentNumber('');
     setPaymentName('');
+  };
+
+  const handleLoginRedirect = () => {
+    setShowLoginAlert(false);
+    window.location.hash = '#login';
   };
 
   const handlePurchaseSubmit = async (e) => {
@@ -225,6 +230,60 @@ const Home = ({ currentUser }) => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Login Alert Modal */}
+      {showLoginAlert && (
+        <div className="modal modal-open">
+          <div
+            className="modal-box p-1 max-w-xs mx-auto"
+            style={{
+              background: 'rgba(255,255,255,0.15)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              borderRadius: '6px',
+              color: '#fff',
+            }}
+          >
+            <div className="flex flex-col items-center text-center">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center mb-1"
+                style={{
+                  background: 'rgba(255,193,7,0.2)',
+                  border: '1px solid rgba(255,193,7,0.5)',
+                }}
+              >
+                <FaExclamationTriangle className="text-yellow-400 text-lg" />
+              </div>
+              
+              <h3 className="font-bold text-sm mb-1 text-yellow-300">Login Required</h3>
+              <p className="text-xs mb-2 text-gray-300">
+                You need to login first to purchase diamonds.
+              </p>
+              
+              <div className="flex gap-2 w-full">
+                <button
+                  className="btn btn-sm flex-1"
+                  onClick={() => setShowLoginAlert(false)}
+                  style={{
+                    background: 'rgba(255,255,255,0.1)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn btn-sm flex-1 text-white"
+                  onClick={handleLoginRedirect}
+                  style={{
+                    background: 'linear-gradient(135deg, #00e6ff, #0077ff)',
+                  }}
+                >
+                  Login Now
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
