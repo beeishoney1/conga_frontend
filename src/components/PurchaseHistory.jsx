@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/backendAPI';
-import { FaGem, FaDollarSign, FaGamepad, FaServer, FaClock, FaCheckCircle, FaTicketAlt, FaCrown } from 'react-icons/fa';
+import { FaGem, FaDollarSign, FaGamepad, FaServer, FaClock, FaCheckCircle, FaTicketAlt, FaCrown, FaCopy, FaFilter } from 'react-icons/fa';
 
 const PurchaseHistory = ({ user }) => {
   const [purchases, setPurchases] = useState([]);
@@ -9,6 +9,7 @@ const PurchaseHistory = ({ user }) => {
   const [error, setError] = useState(null);
   const [filterStatus, setFilterStatus] = useState('All');
   const [copiedVoucher, setCopiedVoucher] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     loadPurchaseHistory();
@@ -24,7 +25,7 @@ const PurchaseHistory = ({ user }) => {
       setPurchases(Array.isArray(purchasesData) ? purchasesData : []);
     } catch (error) {
       console.error('Error loading purchase history:', error);
-      setError('Failed to load purchase history. Please try again.');
+      setError('Failed to load purchase history');
     } finally {
       setLoading(false);
     }
@@ -43,16 +44,16 @@ const PurchaseHistory = ({ user }) => {
     if (!status) return null;
     
     const statusConfig = {
-      Pending: { class: 'bg-yellow-500 text-white px-3 py-1 rounded-full text-sm', icon: '⏳' },
-      Approved: { class: 'bg-green-500 text-white px-3 py-1 rounded-full text-sm', icon: '✅' },
-      Success: { class: 'bg-green-500 text-white px-3 py-1 rounded-full text-sm', icon: '✅' },
-      Processing: { class: 'bg-blue-500 text-white px-3 py-1 rounded-full text-sm', icon: '🔄' },
-      Rejected: { class: 'bg-red-500 text-white px-3 py-1 rounded-full text-sm', icon: '❌' },
-      Failed: { class: 'bg-red-500 text-white px-3 py-1 rounded-full text-sm', icon: '❌' },
-      Cancelled: { class: 'bg-gray-500 text-white px-3 py-1 rounded-full text-sm', icon: '🚫' },
+      Pending: { class: 'bg-yellow-500 text-white px-2 py-0.5 rounded-full text-xs', icon: '⏳' },
+      Approved: { class: 'bg-green-500 text-white px-2 py-0.5 rounded-full text-xs', icon: '✅' },
+      Success: { class: 'bg-green-500 text-white px-2 py-0.5 rounded-full text-xs', icon: '✅' },
+      Processing: { class: 'bg-blue-500 text-white px-2 py-0.5 rounded-full text-xs', icon: '🔄' },
+      Rejected: { class: 'bg-red-500 text-white px-2 py-0.5 rounded-full text-xs', icon: '❌' },
+      Failed: { class: 'bg-red-500 text-white px-2 py-0.5 rounded-full text-xs', icon: '❌' },
+      Cancelled: { class: 'bg-gray-500 text-white px-2 py-0.5 rounded-full text-xs', icon: '🚫' },
     };
     
-    const config = statusConfig[status] || { class: 'bg-gray-500 text-white px-3 py-1 rounded-full text-sm', icon: '❓' };
+    const config = statusConfig[status] || { class: 'bg-gray-500 text-white px-2 py-0.5 rounded-full text-xs', icon: '❓' };
 
     return (
       <span className={config.class}>
@@ -65,7 +66,6 @@ const PurchaseHistory = ({ user }) => {
     if (!dateString) return 'N/A';
     try {
       return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
         month: 'short',
         day: 'numeric',
         hour: '2-digit',
@@ -83,14 +83,10 @@ const PurchaseHistory = ({ user }) => {
   };
 
   const getPurchasePrice = (purchase) => {
-    console.log('Purchase object:', purchase); // Debug log
-    
-    // First, try to get price directly from purchase object
     if (purchase.price !== undefined && purchase.price !== null) {
       return purchase.price;
     }
     
-    // If no direct price, try to find it in the prices array using amount
     const amount = purchase.amount ?? purchase.diamond_amount;
     if (amount !== undefined && amount !== null) {
       const matchedPrice = prices.find((p) => p.amount == amount);
@@ -99,7 +95,6 @@ const PurchaseHistory = ({ user }) => {
       }
     }
     
-    // If still not found, return 0
     return 0;
   };
 
@@ -114,9 +109,9 @@ const PurchaseHistory = ({ user }) => {
   const getPurchaseIcon = (purchase) => {
     const amount = purchase.amount ?? purchase.diamond_amount;
     if (amount === 0 || amount === '0') {
-      return <FaCrown className="text-yellow-400" />;
+      return <FaCrown className="text-yellow-400 text-sm" />;
     }
-    return <FaGem className="text-cyan-400" />;
+    return <FaGem className="text-cyan-400 text-sm" />;
   };
 
   const getPurchaseType = (purchase) => {
@@ -144,14 +139,12 @@ const PurchaseHistory = ({ user }) => {
     return amount === 0 || amount === '0';
   };
 
-  // Generate voucher number from purchase ID
   const generateVoucherNumber = (purchaseId) => {
     if (!purchaseId) return 'N/A';
-    const paddedId = purchaseId.toString().padStart(8, '0');
-    return `VOU-${paddedId}`;
+    const paddedId = purchaseId.toString().padStart(6, '0');
+    return `V${paddedId}`;
   };
 
-  // Copy voucher number to clipboard
   const copyVoucherNumber = (voucherNumber) => {
     navigator.clipboard.writeText(voucherNumber).then(() => {
       setCopiedVoucher(voucherNumber);
@@ -178,9 +171,9 @@ const PurchaseHistory = ({ user }) => {
   if (loading) {
     return (
       <div className="p-4 text-center text-white">
-        <h2 className="text-3xl font-bold mb-6">Purchase History</h2>
-        <span className="loading loading-spinner loading-lg text-cyan-400"></span>
-        <p className="mt-3">Loading your purchases...</p>
+        <h2 className="text-xl font-bold mb-4">Purchase History</h2>
+        <span className="loading loading-spinner loading-md text-cyan-400"></span>
+        <p className="mt-2 text-sm">Loading your purchases...</p>
       </div>
     );
   }
@@ -188,9 +181,9 @@ const PurchaseHistory = ({ user }) => {
   if (error) {
     return (
       <div className="p-4 text-white">
-        <h2 className="text-3xl font-bold mb-6">Purchase History</h2>
-        <div className="alert alert-error">{error}</div>
-        <button onClick={loadPurchaseHistory} className="btn btn-primary mt-3">
+        <h2 className="text-xl font-bold mb-4">Purchase History</h2>
+        <div className="alert alert-error text-sm py-2">{error}</div>
+        <button onClick={loadPurchaseHistory} className="btn btn-primary btn-sm mt-2">
           Try Again
         </button>
       </div>
@@ -198,32 +191,46 @@ const PurchaseHistory = ({ user }) => {
   }
 
   return (
-    <div className="p-4 sm:p-6">
-      <h2 className="text-4xl font-bold mb-6 text-white" style={{ textShadow: '0 0 12px rgba(0,230,255,0.8)' }}>
-        Your Purchase History
-      </h2>
-
-    
-      {/* Status Filter */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        {availableStatuses.map((status) => (
-          <button
-            key={status}
-            onClick={() => setFilterStatus(status)}
-            className={`px-4 py-2 rounded-lg text-sm sm:text-base transition-all ${
-              filterStatus === status 
-                ? 'bg-cyan-500 text-white shadow-lg' 
-                : 'bg-white/10 text-white hover:bg-white/20'
-            }`}
-            style={{ backdropFilter: 'blur(8px)' }}
-          >
-            {status} <span className="ml-2 bg-gray-700 px-2 rounded-full text-xs">{statusCounts[status] || 0}</span>
-          </button>
-        ))}
+    <div className="p-3">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-bold text-white">Purchase History</h2>
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className="btn btn-sm flex items-center gap-1"
+          style={{
+            background: 'rgba(255,255,255,0.1)',
+            border: '1px solid rgba(255,255,255,0.2)',
+          }}
+        >
+          <FaFilter className="text-xs" />
+          Filter
+        </button>
       </div>
 
+      {/* Status Filter */}
+      {showFilters && (
+        <div className="mb-4 flex flex-wrap gap-1 p-2 rounded-lg" style={{
+          background: 'rgba(255,255,255,0.05)',
+          backdropFilter: 'blur(8px)',
+        }}>
+          {availableStatuses.map((status) => (
+            <button
+              key={status}
+              onClick={() => setFilterStatus(status)}
+              className={`px-2 py-1 rounded text-xs transition-all ${
+                filterStatus === status 
+                  ? 'bg-cyan-500 text-white' 
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
+            >
+              {status} <span className="ml-1 bg-gray-700 px-1 rounded">{statusCounts[status] || 0}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Purchases */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {filteredPurchases.map((purchase) => {
           const purchasePrice = getPurchasePrice(purchase);
           const purchaseAmount = getPurchaseAmount(purchase);
@@ -235,106 +242,83 @@ const PurchaseHistory = ({ user }) => {
           const voucherNumber = generateVoucherNumber(purchase.id);
           const weeklyPass = isWeeklyPass(purchase);
 
-          console.log('Rendering purchase:', purchase.id, 'Price:', purchasePrice); // Debug log
-
           return (
             <div
               key={purchase.id || purchase._id || Math.random()}
-              className="p-4 sm:p-5 rounded-xl"
+              className="p-3 rounded-lg"
               style={{
-                background: weeklyPass ? 'rgba(255,215,0,0.1)' : 'rgba(255,255,255,0.1)',
-                backdropFilter: 'blur(12px)',
-                border: weeklyPass ? '1px solid rgba(255,215,0,0.3)' : '1px solid rgba(255,255,255,0.2)',
-                boxShadow: weeklyPass ? '0 6px 18px rgba(255,215,0,0.2)' : '0 6px 18px rgba(0,230,255,0.2)',
-                color: '#fff',
+                background: weeklyPass ? 'rgba(255,215,0,0.08)' : 'rgba(255,255,255,0.08)',
+                backdropFilter: 'blur(8px)',
+                border: weeklyPass ? '1px solid rgba(255,215,0,0.2)' : '1px solid rgba(255,255,255,0.1)',
               }}
             >
-              {/* Voucher Number Header */}
-              <div className="flex items-center justify-between mb-4 pb-2 border-b border-gray-600">
+              {/* Header */}
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <FaTicketAlt className="text-cyan-400 text-lg" />
-                  <span className="text-sm text-gray-300">Voucher Number:</span>
-                  <span className="font-mono font-bold text-cyan-300">{voucherNumber}</span>
+                  {purchaseIcon}
+                  <span className="font-semibold text-sm">{purchaseAmount}</span>
+                  {getStatusBadge(purchaseStatus)}
                 </div>
+                <span className="text-cyan-300 font-bold text-sm">{formatPrice(purchasePrice)}</span>
+              </div>
+
+              {/* Voucher Number */}
+              <div className="flex items-center justify-between mb-2 text-xs text-gray-400">
+                <span>Voucher: {voucherNumber}</span>
                 <button
                   onClick={() => copyVoucherNumber(voucherNumber)}
-                  className="btn btn-xs btn-ghost text-xs text-cyan-400 hover:text-cyan-300"
+                  className="flex items-center gap-1 hover:text-cyan-300"
                   title="Copy voucher number"
                 >
-                  {copiedVoucher === voucherNumber ? '✅ Copied!' : '📋 Copy'}
+                  <FaCopy className="text-xs" />
+                  {copiedVoucher === voucherNumber ? 'Copied!' : 'Copy'}
                 </button>
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg sm:text-xl font-bold flex items-center gap-1">
-                      {purchaseIcon} {purchaseAmount}
-                    </h3>
-                    {getStatusBadge(purchaseStatus)}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm sm:text-base">
-                    <p className="flex items-center gap-1">
-                      <span className="text-gray-400">Type:</span>
-                      <span className="font-medium">{purchaseType}</span>
-                    </p>
-                    <p className="flex items-center gap-1">
-                      <FaGamepad /> Game: {gameInfo}
-                    </p>
-                    <p className="flex items-center gap-1">
-                      <FaServer /> Server: {serverInfo}
-                    </p>
-                    <p className="flex items-center gap-1">
-                      <FaDollarSign /> Price: {formatPrice(purchasePrice)}
-                    </p>
-                    <p className="flex items-center gap-1">
-                      <FaClock /> Date: {formatDate(purchase.created_at)}
-                    </p>
-                  </div>
-
-                  {/* Show payment details if available */}
-                  {(purchase.payment_number || purchase.payment_name) && (
-                    <div className="mt-3 p-2 bg-cyan-900/30 rounded">
-                      <p className="text-xs text-cyan-300">
-                        Payment: {purchase.payment_number} ({purchase.payment_name})
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Show admin notes if available */}
-                  {purchase.admin_notes && (
-                    <div className="mt-2 p-2 bg-gray-700/30 rounded">
-                      <p className="text-xs text-gray-300">
-                        <strong>Admin Notes:</strong> {purchase.admin_notes}
-                      </p>
-                    </div>
-                  )}
+              {/* Details */}
+              <div className="grid grid-cols-2 gap-1 text-xs mb-2">
+                <div className="flex items-center gap-1">
+                  <FaGamepad className="text-gray-400" />
+                  <span>{gameInfo}</span>
                 </div>
-
-                <div className="text-right mt-2 sm:mt-0">
-                  <p className="text-xl sm:text-2xl font-bold text-cyan-300">{formatPrice(purchasePrice)}</p>
-                  <p className="text-sm text-gray-400 mt-1">{purchaseType}</p>
+                <div className="flex items-center gap-1">
+                  <FaServer className="text-gray-400" />
+                  <span>{serverInfo}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <FaClock className="text-gray-400" />
+                  <span>{formatDate(purchase.created_at)}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <FaDollarSign className="text-gray-400" />
+                  <span>{purchaseType}</span>
                 </div>
               </div>
 
-              {/* Special instructions for weekly pass */}
-              {weeklyPass && purchaseStatus === 'Success' && (
-                <div className="mt-4 p-3 bg-yellow-900/30 rounded-lg">
-                  <p className="text-xs text-yellow-300">
-                    <strong>🎉 Weekly Pass Activated!</strong> Your weekly benefits are now active. 
-                    This pass will automatically renew every week until cancelled.
-                  </p>
+              {/* Additional Info */}
+              {(purchase.payment_number || purchase.admin_notes) && (
+                <div className="mt-2 p-2 rounded text-xs" style={{
+                  background: 'rgba(0,0,0,0.2)',
+                }}>
+                  {purchase.payment_number && (
+                    <p className="text-cyan-300 mb-1">
+                      Payment: {purchase.payment_number} ({purchase.payment_name})
+                    </p>
+                  )}
+                  {purchase.admin_notes && (
+                    <p className="text-yellow-300">
+                      <strong>Note:</strong> {purchase.admin_notes}
+                    </p>
+                  )}
                 </div>
               )}
 
-              {/* Instructions for using voucher number */}
-              {purchaseStatus === 'Pending' && (
-                <div className="mt-4 p-3 bg-yellow-900/30 rounded-lg">
-                  <p className="text-xs text-yellow-300">
-                    <strong>Note:</strong> Use voucher number <code className="bg-yellow-800 px-1 rounded">{voucherNumber}</code> when 
-                    contacting support about this order.
-                  </p>
+              {/* Weekly Pass Info */}
+              {weeklyPass && purchaseStatus === 'Success' && (
+                <div className="mt-2 p-1 rounded text-xs text-yellow-300" style={{
+                  background: 'rgba(255,215,0,0.1)',
+                }}>
+                  🎉 Weekly Pass Activated
                 </div>
               )}
             </div>
@@ -343,35 +327,33 @@ const PurchaseHistory = ({ user }) => {
       </div>
 
       {filteredPurchases.length === 0 && (
-        <div className="text-center py-12 text-white">
-          <div className="text-5xl sm:text-6xl mb-3">📦</div>
-          <h3 className="text-lg sm:text-xl font-semibold mb-2">
+        <div className="text-center py-8 text-white">
+          <div className="text-3xl mb-2">📦</div>
+          <h3 className="text-sm font-semibold mb-1">
             {filterStatus === 'All' ? 'No purchases yet' : `No ${filterStatus.toLowerCase()} purchases`}
           </h3>
-          <p className="text-gray-300 mb-4">
+          <p className="text-gray-300 text-xs mb-3">
             {filterStatus === 'All'
-              ? 'Your purchase history will appear here once you make your first order.'
-              : `You don't have any ${filterStatus.toLowerCase()} purchases.`}
+              ? 'Your purchase history will appear here.'
+              : `Try a different filter.`}
           </p>
           {filterStatus !== 'All' && (
-            <button onClick={() => setFilterStatus('All')} className="btn btn-primary">
-              View All Purchases
+            <button 
+              onClick={() => setFilterStatus('All')} 
+              className="btn btn-primary btn-sm text-xs"
+            >
+              View All
             </button>
           )}
         </div>
       )}
 
-      {/* Information about voucher numbers */}
-      <div className="mt-8 p-4 bg-cyan-900/20 rounded-lg">
-        <h4 className="text-lg font-semibold text-cyan-300 mb-2 flex items-center gap-2">
-          <FaTicketAlt /> About Voucher Numbers
-        </h4>
-        <ul className="text-sm text-gray-300 space-y-1">
-          <li>• Each purchase has a unique voucher number (VOU-XXXXXXX)</li>
-          <li>• Use this number when contacting customer support</li>
-          <li>• Click the "Copy" button to easily share your voucher number</li>
-          <li>• Voucher numbers help us quickly locate your order in our system</li>
-        </ul>
+      {/* Voucher Info */}
+      <div className="mt-4 p-2 rounded-lg text-xs" style={{
+        background: 'rgba(0,230,255,0.1)',
+      }}>
+        <p className="text-cyan-300 font-semibold mb-1">💡 Voucher Numbers</p>
+        <p className="text-gray-300">Use voucher numbers when contacting support for faster service.</p>
       </div>
     </div>
   );
