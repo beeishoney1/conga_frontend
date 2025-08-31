@@ -48,13 +48,6 @@ const Nav = ({ currentUser, onLogout }) => {
       <div className="navbar-end flex gap-2 items-center">
         {currentUser ? (
           <>
-            <button
-              onClick={() => (window.location.hash = '#home')}
-              className="neo-btn flex items-center gap-2"
-            >
-              <FaHome className="text-sm" />
-              Home
-            </button>
             {currentUser.is_admin && (
               <button
                 onClick={() => (window.location.hash = '#admin')}
@@ -106,13 +99,22 @@ const Nav = ({ currentUser, onLogout }) => {
                       </p>
                     </div>
 
+                    {/* Home - Added to dropdown */}
+                    <button
+                      onClick={() => handleNavigation('#home')}
+                      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-cyan-900/40 transition-all duration-200 group"
+                    >
+                      <FaHome className="text-cyan-400 group-hover:text-cyan-300 text-base" />
+                      <span className="text-sm font-medium text-white group-hover:text-cyan-100">Home</span>
+                    </button>
+
                     {/* History */}
                     <button
                       onClick={() => handleNavigation('#history')}
-                      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-cyan-900/40 transition-all duration-200 group"
+                      className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-purple-900/40 transition-all duration-200 group"
                     >
                       <FaHistory className="text-purple-400 group-hover:text-purple-300 text-base" />
-                      <span className="text-sm font-medium text-white group-hover:text-cyan-100">Purchase History</span>
+                      <span className="text-sm font-medium text-white group-hover:text-purple-100">Purchase History</span>
                     </button>
 
                     {/* Guide */}
@@ -151,12 +153,6 @@ const Nav = ({ currentUser, onLogout }) => {
           </>
         ) : (
           <>
-            <button
-              onClick={() => (window.location.hash = '#home')}
-              className="neo-btn"
-            >
-              Home
-            </button>
             <button
               onClick={() => (window.location.hash = '#login')}
               className="neo-btn"

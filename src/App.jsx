@@ -11,6 +11,14 @@ const App = () => {
   const [currentView, setCurrentView] = useState('home');
 
   useEffect(() => {
+  // This ensures the loading spinner is hidden once React is fully loaded
+  const loadingElement = document.getElementById('loading');
+  if (loadingElement) {
+    loadingElement.style.display = 'none';
+  }
+  document.body.classList.add('loaded');
+}, []);
+  useEffect(() => {
     // Check hash for routing
     const handleHashChange = () => {
       const hash = window.location.hash.substring(1);
