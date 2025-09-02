@@ -40,7 +40,7 @@ const Nav = ({ currentUser, onLogout }) => {
             
           }}
         >
-          💎 Conga Shop
+          💎 CONGA Shop
         </button>
       </div>
 
