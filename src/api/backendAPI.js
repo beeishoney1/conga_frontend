@@ -81,5 +81,9 @@ export const api = {
     }).then(res => res.json()),
 
   filterPurchases: (username) =>
-    fetch(`${BASE_URL}/admin/filter-purchases?username=${username}`).then(res => res.json())
+    fetch(`${BASE_URL}/admin/filter-purchases?username=${username}`).then(res => res.json()),
+
+  // Add this to your backendAPI.js file
+getAllUsers: () =>
+  fetch(`${BASE_URL}/admin/users`).then(res => res.json())
 };

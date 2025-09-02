@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api/backendAPI';
-import { FaCheckCircle, FaTimesCircle, FaClock, FaEye, FaEdit, FaTrash, FaSearch, FaSync, FaBars, FaTimes } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle, FaClock, FaEye, FaEdit, FaTrash, FaSearch, FaSync, FaBars, FaTimes, FaUser, FaDollarSign } from 'react-icons/fa';
 
 const AdminPanel = ({ user }) => {
   const [allPurchases, setAllPurchases] = useState([]);
   const [prices, setPrices] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('pending');
   const [usernameFilter, setUsernameFilter] = useState('');
@@ -36,10 +37,12 @@ const AdminPanel = ({ user }) => {
   });
 
   useEffect(() => {
-    if (activeTab !== 'prices') {
-      loadPurchases();
-    } else {
+    if (activeTab === 'prices') {
       loadPrices();
+    } else if (activeTab === 'users') {
+      loadUsers();
+    } else {
+      loadPurchases();
     }
   }, [activeTab]);
 
@@ -64,6 +67,20 @@ const AdminPanel = ({ user }) => {
     } catch (error) {
       console.error('Error loading prices:', error);
       showAlert('Error loading prices: ' + error.message, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      // You'll need to create this API endpoint in your backend
+      const data = await api.getAllUsers();
+      setAllUsers(data.users || []);
+    } catch (error) {
+      console.error('Error loading users:', error);
+      showAlert('Error loading users: ' + error.message, 'error');
     } finally {
       setLoading(false);
     }
@@ -269,6 +286,18 @@ const AdminPanel = ({ user }) => {
     setShowDeleteConfirm(true);
   };
 
+  // Calculate price for a purchase
+  const calculatePurchasePrice = (purchase) => {
+    // Find the matching price from the prices list
+    const matchingPrice = prices.find(price => 
+      price.game_name === purchase.game_id && 
+      price.server_name === purchase.server_id && 
+      price.amount === purchase.amount
+    );
+    
+    return matchingPrice ? `$${matchingPrice.price}` : 'Price not found';
+  };
+
   return (
     <div className="p-2 max-w-full mx-auto bg-gray-900 min-h-screen text-white">
       <div className="flex justify-between items-center mb-2">
@@ -317,7 +346,7 @@ const AdminPanel = ({ user }) => {
             setMobileMenuOpen(false);
           }}
         >
-          All
+          All Orders
         </button>
         <button 
           className={`tab ${activeTab === 'prices' ? 'tab-active bg-purple-600 text-white' : 'text-gray-300 hover:bg-gray-700'} ${mobileMenuOpen ? 'w-full justify-center' : ''} px-3 py-1 rounded-md transition-colors`}
@@ -327,6 +356,15 @@ const AdminPanel = ({ user }) => {
           }}
         >
           Prices
+        </button>
+        <button 
+          className={`tab ${activeTab === 'users' ? 'tab-active bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'} ${mobileMenuOpen ? 'w-full justify-center' : ''} px-3 py-1 rounded-md transition-colors`}
+          onClick={() => {
+            setActiveTab('users');
+            setMobileMenuOpen(false);
+          }}
+        >
+          <FaUser className="mr-1" /> Users
         </button>
       </div>
 
@@ -372,6 +410,11 @@ const AdminPanel = ({ user }) => {
               <div className="flex justify-between items-center p-1 rounded bg-gray-700">
                 <span className="font-semibold text-xs">Amount:</span>
                 <span className="text-cyan-300 text-xs">{selectedPurchase.amount} diamonds</span>
+              </div>
+              
+              <div className="flex justify-between items-center p-1 rounded bg-gray-700">
+                <span className="font-semibold text-xs">Price:</span>
+                <span className="text-green-300 text-xs">{calculatePurchasePrice(selectedPurchase)}</span>
               </div>
               
               <div className="flex justify-between items-center p-1 rounded bg-gray-700">
@@ -509,7 +552,7 @@ const AdminPanel = ({ user }) => {
       )}
 
       {/* Purchases Tabs */}
-      {activeTab !== 'prices' && (
+      {['pending', 'success', 'failed', 'all'].includes(activeTab) && (
         <div>
           {/* User Filter */}
           <div className="mb-3">
@@ -550,6 +593,7 @@ const AdminPanel = ({ user }) => {
                   <th className="text-white p-1">User</th>
                   <th className="text-white p-1">Game/Server</th>
                   <th className="text-white p-1">Amount</th>
+                  <th className="text-white p-1">Price</th>
                   <th className="text-white p-1">Status</th>
                   <th className="text-white p-1">Actions</th>
                 </tr>
@@ -557,7 +601,7 @@ const AdminPanel = ({ user }) => {
               <tbody>
                 {filteredPurchases.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-4 text-gray-400 text-xs">
+                    <td colSpan="6" className="text-center py-4 text-gray-400 text-xs">
                       No {activeTab !== 'all' ? activeTab : ''} purchases found
                     </td>
                   </tr>
@@ -570,6 +614,7 @@ const AdminPanel = ({ user }) => {
                         <div className="text-xxs text-gray-400">{purchase.server_id}</div>
                       </td>
                       <td className="text-yellow-300 p-1">{purchase.amount}</td>
+                      <td className="text-green-300 p-1">{calculatePurchasePrice(purchase)}</td>
                       <td className="p-1">{getStatusBadge(purchase.status)}</td>
                       <td className="p-1">
                         <button 
@@ -729,6 +774,60 @@ const AdminPanel = ({ user }) => {
                             <FaTrash className="text-xxs" />
                           </button>
                         </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Users Tab */}
+      {activeTab === 'users' && (
+        <div>
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-md font-semibold text-white">All Users</h3>
+            <button 
+              onClick={loadUsers} 
+              className="btn btn-xs bg-cyan-600 hover:bg-cyan-500 text-white border-0"
+              disabled={loading}
+            >
+              <FaSync className={loading ? 'animate-spin text-xs' : 'text-xs'} />
+            </button>
+          </div>
+
+          {/* Users Table */}
+          <div className="overflow-x-auto rounded-lg bg-gray-800 text-xs">
+            <table className="table table-zebra table-xs w-full">
+              <thead>
+                <tr className="bg-gray-700">
+                  <th className="text-white p-1">ID</th>
+                  <th className="text-white p-1">Username</th>
+                  <th className="text-white p-1">Telegram ID</th>
+                  <th className="text-white p-1">Created At</th>
+                  <th className="text-white p-1">Orders</th>
+                </tr>
+              </thead>
+              <tbody>
+                {allUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="text-center py-4 text-gray-400 text-xs">
+                      No users found.
+                    </td>
+                  </tr>
+                ) : (
+                  allUsers.map(user => (
+                    <tr key={user.id} className="hover:bg-gray-700 transition-colors">
+                      <td className="text-cyan-300 p-1">{user.id}</td>
+                      <td className="font-semibold text-white p-1">{user.username}</td>
+                      <td className="text-yellow-300 p-1">{user.telegram_id || 'N/A'}</td>
+                      <td className="text-gray-400 p-1">{formatDateTime(user.created_at)}</td>
+                      <td className="p-1">
+                        <span className="text-green-300">
+                          {allPurchases.filter(p => p.user_id === user.id).length}
+                        </span>
                       </td>
                     </tr>
                   ))
