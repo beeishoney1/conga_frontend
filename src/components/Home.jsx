@@ -438,14 +438,14 @@ const Home = ({ currentUser }) => {
                       <p className="text-white font-semibold text-xs">Send To:</p>
                       {paymentMethod === 'wave' && (
                         <>
-                          <p className="text-cyan-300 text-xs">နံပတ်: 099813454</p>
-                          <p className="text-cyan-300 text-xs">နာမည်: Kyaw Kyaw</p>
+                          <p className="text-cyan-300 text-xs">နံပတ်: 09695566044</p>
+                          <p className="text-cyan-300 text-xs">နာမည်: Moe Sandar Shwe</p>
                         </>
                       )}
                       {paymentMethod === 'kpay' && (
                         <>
-                          <p className="text-cyan-300 text-xs">နံပတ်: 09451234567</p>
-                          <p className="text-cyan-300 text-xs">နာမည်: Min Min</p>
+                          <p className="text-cyan-300 text-xs">နံပတ်: 09660765719</p>
+                          <p className="text-cyan-300 text-xs">နာမည်: Moe Moe Htwe</p>
                         </>
                       )}
                     </div>
