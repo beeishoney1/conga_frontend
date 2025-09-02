@@ -5,6 +5,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import PurchaseHistory from './components/PurchaseHistory';
 import AdminPanel from './components/AdminPanel';
+import ContactAdmin from './components/ContantAdmin'; // Add this import
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -64,6 +65,8 @@ const App = () => {
         return currentUser ? <PurchaseHistory user={currentUser} /> : <div className="text-white text-center p-4">Please login first</div>;
       case 'admin':
         return currentUser?.is_admin ? <AdminPanel user={currentUser} /> : <div className="text-white text-center p-4">Access denied</div>;
+      case 'contact': // Add this case
+        return <ContactAdmin />;
       default:
         return <Home currentUser={currentUser} />;
     }
