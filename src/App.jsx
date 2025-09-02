@@ -73,6 +73,8 @@ const App = () => {
   };
 
   return (
+    
+
     <div className="min-h-screen" style={{
       backgroundColor: '#0a1e32',
       backgroundImage: 'radial-gradient(circle at 15% 50%, rgba(0, 119, 255, 0.1) 0%, transparent 25%), radial-gradient(circle at 85% 30%, rgba(0, 230, 255, 0.1) 0%, transparent 25%)'
