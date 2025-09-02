@@ -421,11 +421,11 @@ const Home = ({ currentUser }) => {
 
                   <div className="form-control">
                     <label className="label text-white py-0">
-                      <span className="label-text text-xs">Payment - လုပ်ငန်းစဥ်နံပတ်</span>
+                      <span className="label-text text-xs">Payment - လုပ်ငန်းစဥ်နံပတ်နဲ့ Payment နာမည်</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="လုပ်ငန်းစဥ်နံပတ်"
+                      placeholder="eg-123123232123, Kpay or Wave"
                       className="input input-bordered text-black bg-white input-sm p-2 text-xs"
                       value={paymentNumber}
                       onChange={(e) => setPaymentNumber(e.target.value)}
@@ -436,11 +436,11 @@ const Home = ({ currentUser }) => {
                   
                   <div className="form-control">
                     <label className="label text-white py-0">
-                      <span className="label-text text-xs">ပေးချေသူနာမည်</span>
+                      <span className="label-text text-xs">ပေးချေသူနာမည်နဲ့ဖုန်းနံပတ်</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="ပေးချေသူနာမည်"
+                      placeholder="eg. Kyaw Kyaw , 09xxxxxxx"
                       className="input input-bordered text-black bg-white input-sm p-2 text-xs"
                       value={paymentName}
                       onChange={(e) => setPaymentName(e.target.value)}
