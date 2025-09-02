@@ -8,7 +8,6 @@ const Home = ({ currentUser }) => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [gameId, setGameId] = useState('');
   const [serverId, setServerId] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('');
   const [paymentNumber, setPaymentNumber] = useState('');
   const [paymentName, setPaymentName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,7 +40,6 @@ const Home = ({ currentUser }) => {
     setSelectedPackage(price);
     setShowPurchaseModal(true);
     setMessage('');
-    setPaymentMethod('');
     setPaymentNumber('');
     setPaymentName('');
   };
@@ -58,7 +56,7 @@ const Home = ({ currentUser }) => {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     
-    if (!gameId || !serverId || !paymentMethod || !paymentNumber || !paymentName) {
+    if (!gameId || !serverId || !paymentNumber || !paymentName) {
       setMessage('Please fill all fields');
       isSubmittingRef.current = false;
       return;
@@ -87,7 +85,6 @@ const Home = ({ currentUser }) => {
       // Clear form fields
       setGameId('');
       setServerId('');
-      setPaymentMethod('');
       setPaymentNumber('');
       setPaymentName('');
       
@@ -400,88 +397,58 @@ const Home = ({ currentUser }) => {
               </div>
 
               <div className="form-control">
-                <label className="label text-white text-xs p-1">Payment Method</label>
-                <div className="flex gap-2 mb-2">
-                  <label className="flex items-center gap-1 cursor-pointer text-xs">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="wave"
-                      checked={paymentMethod === 'wave'}
-                      onChange={() => setPaymentMethod('wave')}
-                      className="radio radio-primary radio-xs"
-                      disabled={isSubmitting}
-                    />
-                    <span className="flex items-center gap-1">
-                      <FaMoneyBillWave className="text-xs" /> Wave
-                    </span>
-                  </label>
-                  <label className="flex items-center gap-1 cursor-pointer text-xs">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value="kpay"
-                      checked={paymentMethod === 'kpay'}
-                      onChange={() => setPaymentMethod('kpay')}
-                      className="radio radio-primary radio-xs"
-                      disabled={isSubmitting}
-                    />
-                    <span className="flex items-center gap-1">
-                      <FaCreditCard className="text-xs" /> KPay
-                    </span>
-                  </label>
-                </div>
-                
-                {paymentMethod && (
-                  <div className="bg-cyan-900/30 p-2 rounded space-y-2 text-xs">
-                    <div className="p-2 bg-cyan-800/50 rounded">
-                      <p className="text-white font-semibold text-xs">Send To:</p>
-                      {paymentMethod === 'wave' && (
-                        <>
-                          <p className="text-cyan-300 text-xs">နံပတ်: 09695566044</p>
-                          <p className="text-cyan-300 text-xs">နာမည်: Moe Sandar Shwe</p>
-                        </>
-                      )}
-                      {paymentMethod === 'kpay' && (
-                        <>
-                          <p className="text-cyan-300 text-xs">နံပတ်: 09660765719</p>
-                          <p className="text-cyan-300 text-xs">နာမည်: Moe Moe Htwe</p>
-                        </>
-                      )}
+                <label className="label text-white text-xs p-1">Payment Methods</label>
+                <div className="bg-cyan-900/30 p-2 rounded space-y-2 text-xs">
+                  {/* Wave Payment Info */}
+                  <div className="p-2 bg-cyan-800/50 rounded">
+                    <div className="flex items-center gap-1 mb-1">
+                      <FaMoneyBillWave className="text-xs text-green-400" />
+                      <p className="text-white font-semibold text-xs">Wave Money</p>
                     </div>
-
-                    <div className="form-control">
-                      <label className="label text-white py-0">
-                        <span className="label-text text-xs">Payment - လုပ်ငန်းစဥ်နံပတ်</span>
-                        
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="လုပ်ငန်းစဥ်နံပတ်"
-                        className="input input-bordered text-black bg-white input-sm p-2 text-xs"
-                        value={paymentNumber}
-                        onChange={(e) => setPaymentNumber(e.target.value)}
-                        required
-                        disabled={isSubmitting}
-                      />
-                    </div>
-                    
-                    <div className="form-control">
-                      <label className="label text-white py-0">
-                        <span className="label-text text-xs">ပေးချေသူနာမည်</span>
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="ပေးချေသူနာမည်"
-                        className="input input-bordered text-black bg-white input-sm p-2 text-xs"
-                        value={paymentName}
-                        onChange={(e) => setPaymentName(e.target.value)}
-                        required
-                        disabled={isSubmitting}
-                      />
-                    </div>
+                    <p className="text-cyan-300 text-xs">နံပတ်: 09695566044</p>
+                    <p className="text-cyan-300 text-xs">နာမည်: Moe Sandar Shwe</p>
                   </div>
-                )}
+
+                  {/* KPay Payment Info */}
+                  <div className="p-2 bg-cyan-800/50 rounded">
+                    <div className="flex items-center gap-1 mb-1">
+                      <FaCreditCard className="text-xs text-blue-400" />
+                      <p className="text-white font-semibold text-xs">KBZ Pay</p>
+                    </div>
+                    <p className="text-cyan-300 text-xs">နံပတ်: 09660765719</p>
+                    <p className="text-cyan-300 text-xs">နာမည်: Moe Moe Htwe</p>
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label text-white py-0">
+                      <span className="label-text text-xs">Payment - လုပ်ငန်းစဥ်နံပတ်</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="လုပ်ငန်းစဥ်နံပတ်"
+                      className="input input-bordered text-black bg-white input-sm p-2 text-xs"
+                      value={paymentNumber}
+                      onChange={(e) => setPaymentNumber(e.target.value)}
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  
+                  <div className="form-control">
+                    <label className="label text-white py-0">
+                      <span className="label-text text-xs">ပေးချေသူနာမည်</span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="ပေးချေသူနာမည်"
+                      className="input input-bordered text-black bg-white input-sm p-2 text-xs"
+                      value={paymentName}
+                      onChange={(e) => setPaymentName(e.target.value)}
+                      required
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                </div>
               </div>
 
               {message && (
