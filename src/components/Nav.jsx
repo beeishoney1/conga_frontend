@@ -8,10 +8,7 @@ const Nav = ({ currentUser, onLogout }) => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleNavigation = (hash) => {
-    window.location.hash = hash;
-    setIsDropdownOpen(false);
-  };
+
 
   return (
     <div
@@ -38,7 +35,9 @@ const Nav = ({ currentUser, onLogout }) => {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             textShadow: '0 0 12px rgba(0, 230, 255, 0.8)',
-            fontFamily: 'Poppins, sans-serif'
+            fontFamily: 'Poppins, sans-serif',
+            fontWeight: 'bold'
+            
           }}
         >
           💎 Conga Shop
@@ -132,7 +131,8 @@ const Nav = ({ currentUser, onLogout }) => {
                       className="w-full text-left px-4 py-3 flex items-center gap-3 hover:bg-green-900/40 transition-all duration-200 group"
                     >
                       <FaHeadset className="text-green-400 group-hover:text-green-300 text-base" />
-                      <span className="text-sm font-medium text-white group-hover:text-green-100">Contact Admin</span>
+                      <span className="text-sm font-medium text-white group-hover:text-green-100"><a href='https://t.me/CONGA376
+'>Contact Admin</a></span>
                     </button>
 
                     {/* Logout */}
